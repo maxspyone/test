@@ -1,33 +1,10 @@
 <?php
 
 
-
-//###########################################
-// MYSQL 
-//###########################################
-
-$dbhost   = "localhost";
-$database = "markusgraf_2331";
-$dbuser   = "markusgraf_2331_usr";
-$dbpass   = "o_af2AdnsSf_j4ex";
-
-$mysqli = new mysqli($dbhost,$dbuser,$dbpass,$database);
-$mysqli->set_charset("utf8");
-/* check connection */
-if ($mysqli->connect_errno) {
-    printf("Connect failed: %s\n", $mysqli->connect_error);
-    exit();
-}
-
-
-//###########################################
-//#   START
-//###########################################
-
 function rechnungsnummer($nr){
 	return date("Y")."-".str_pad($nr, 4, 0, STR_PAD_LEFT);
 };
-//$rechnungs_datum = date("d.m.Y");
+$rechnungs_datum = date("d.m.Y");
 $lieferdatum = date("d.m.Y");
 $pdfAuthor = "Online Buchhaltungssystem";
  
@@ -39,9 +16,7 @@ Mail: office@markus-graf.at';
 
 
 $rechnungs_absender = 'Ing. Markus Graf MBA • Weichselgasse 6 • 2500 Baden';
-$rechnungs_posten = array();
 
-/*
 $rechnungs_empfaenger = 'TEK Industries
 Gerlinde Foltin
 Wienerstraße - Werkstraße 107 - TOP 1
@@ -179,42 +154,6 @@ ATU54158600';
  array("Wartung- und Installationsarbeiten", 12.00, "Stunde(n)", 50.00),
  );
   $rechnungs_nummer = rechnungsnummer(8);
-  
-  */
- 
-// ######################################################
-//	DATEN AUS MYSQL
-// ######################################################
-
-
-$query = "SELECT * FROM kunde, a_buchung, a_buchung_zeile WHERE a_buchung.rechnungsnummer='2021-0009' ORDER BY a_buchung_zeile.id ASC";
-
-// Using iterators
-$result = $mysqli->query($query);
-
-
- foreach ($result as $row) {
-	$rechnungs_empfaenger = $row["name"].'
-	'.$row["name2"].'
-	'.$row["strasse"].'
-	'.$row["plz"].' '.$row["ort"].'
-	'.$row["uid"].'';
-
-	  $rechnungs_nummer = $row["rechnungsnummer"];
-	  $rechnungs_datum = date('d.m.Y', strtotime($row["rechnungsdatum"]));
-	  
-	array_push($rechnungs_posten, array($row["bezeichnung"], $row["menge"], $row["einheit"], $row["einzelpreis"]));
- };
- 
- 
- /*
- foreach ($result as $row) {
-	echo"<pre>";
-	print_r($row);
-	echo"</pre>";
-	//$rechnungs_empfaenger = print_r($row);
-}
-*/ 
  
  
 //Höhe eurer Umsatzsteuer. 0.19 für 19% Umsatzsteuer
@@ -276,7 +215,7 @@ $gesamtpreis = 0;
 foreach($rechnungs_posten as $posten) {
  $menge = $posten[1];
  $einzelpreis = $posten[3];
- $preis = round($menge*$einzelpreis,2);
+ $preis = $menge*$einzelpreis;
  $gesamtpreis += $preis;
  $html .= '<tr>
                 <td>'.$posten[0].'</td>
